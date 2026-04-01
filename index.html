@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Advanced ID Card Generator</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<style>
+:root {
+    --mainColor: #ff7a00;
+    --secondColor: #ffb347;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #eef2f7;
+    padding: 20px;
+}
+
+/* CONTROL PANEL */
+.controls {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+input {
+    margin: 5px;
+    padding: 8px;
+}
+
+/* CARD */
+.id-card {
+    width: 360px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* CURVED DESIGN */
+.top-design {
+    height: 120px;
+    background: linear-gradient(135deg, var(--mainColor), var(--secondColor));
+    border-bottom-left-radius: 80% 40%;
+    border-bottom-right-radius: 30% 20%;
+}
+
+/* LOGO */
+.logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+
+/* COLLEGE NAME */
+.college-name {
+    position: absolute;
+    top: 30px;
+    left: 90px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* PHOTO RIGHT */
+.photo {
+    width: 110px;
+    height: 130px;
+    border-radius: 12px;
+    border: 3px solid #fff;
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background: #fff;
+    object-fit: cover;
+}
+
+/* DETAILS */
+.details {
+    margin-top: 90px;
+    padding: 15px;
+    font-size: 14px;
+    width: 60%;
+}
+
+.details p {
+    margin: 5px 0;
+}
+
+/* SIGNATURE RIGHT */
+.footer {
+    padding: 10px;
+    text-align: right;
+}
+
+.signature {
+    width: 90px;
+    height: 35px;
+    border-bottom: 1px solid #000;
+}
+
+.sign-label {
+    font-size: 11px;
+}
+
+/* BUTTON */
+button {
+    padding: 10px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+/* COLOR PICKER */
+.color-box {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="controls">
+    <h3>🎓 Professional ID Card Generator</h3>
+
+    <input type="text" id="collegeName" placeholder="College Name">
+    <input type="text" id="name" placeholder="Student Name">
+    <input type="text" id="father" placeholder="Father Name">
+    <input type="date" id="dob">
+    <input type="text" id="branch" placeholder="Branch">
+    <input type="text" id="roll" placeholder="Roll No">
+    <input type="text" id="address" placeholder="Address">
+    <input type="text" id="blood" placeholder="Blood Group">
+    <input type="date" id="validity">
+
+    <br>
+    Logo: <input type="file" id="logoInput">
+    Photo: <input type="file" id="photoInput">
+    Signature: <input type="file" id="signInput">
+
+    <div class="color-box">
+        🎨 Main Color: <input type="color" id="mainColor" value="#ff7a00">
+        🎨 Gradient Color: <input type="color" id="secondColor" value="#ffb347">
+    </div>
+
+    <br>
+    <button onclick="generateCard()">Generate</button>
+    <button onclick="downloadPDF()">Download HD PDF</button>
+</div>
+
+<!-- CARD -->
+<div id="card" class="id-card">
+
+    <div class="top-design"></div>
+
+    <img id="logo" class="logo">
+    <div class="college-name" id="collegeText">College Name</div>
+
+    <img id="photo" class="photo">
+
+    <div class="details">
+        <p><b>ID:</b> <span id="idText"></span></p>
+        <p><b>Name:</b> <span id="nameText"></span></p>
+        <p><b>Father:</b> <span id="fatherText"></span></p>
+        <p><b>DOB:</b> <span id="dobText"></span></p>
+        <p><b>Branch:</b> <span id="branchText"></span></p>
+        <p><b>Roll:</b> <span id="rollText"></span></p>
+        <p><b>Blood:</b> <span id="bloodText"></span></p>
+        <p><b>Issue:</b> <span id="issueText"></span></p>
+        <p><b>Valid:</b> <span id="validityText"></span></p>
+        <p><b>Address:</b> <span id="addressText"></span></p>
+    </div>
+
+    <div class="footer">
+        <img id="signature" class="signature"><br>
+        <span class="sign-label">Principal Signature</span>
+    </div>
+
+</div>
+
+<script>
+
+/* AUTO ID */
+function generateID() {
+    return "ID-" + Math.floor(100000 + Math.random() * 900000);
+}
+
+/* DATE FORMAT */
+function formatDate(value) {
+    if (!value) return "";
+    return new Date(value).toDateString();
+}
+
+/* GENERATE */
+function generateCard() {
+    document.getElementById("collegeText").innerText = document.getElementById("collegeName").value;
+    document.getElementById("nameText").innerText = document.getElementById("name").value;
+    document.getElementById("fatherText").innerText = document.getElementById("father").value;
+    document.getElementById("dobText").innerText = formatDate(document.getElementById("dob").value);
+    document.getElementById("branchText").innerText = document.getElementById("branch").value;
+    document.getElementById("rollText").innerText = document.getElementById("roll").value;
+    document.getElementById("addressText").innerText = document.getElementById("address").value;
+    document.getElementById("bloodText").innerText = document.getElementById("blood").value;
+    document.getElementById("validityText").innerText = formatDate(document.getElementById("validity").value);
+
+    document.getElementById("idText").innerText = generateID();
+    document.getElementById("issueText").innerText = new Date().toDateString();
+
+    // APPLY COLORS
+    document.documentElement.style.setProperty('--mainColor', document.getElementById("mainColor").value);
+    document.documentElement.style.setProperty('--secondColor', document.getElementById("secondColor").value);
+}
+
+/* IMAGE PREVIEW */
+function preview(inputId, imgId) {
+    document.getElementById(inputId).addEventListener("change", function(e){
+        const reader = new FileReader();
+        reader.onload = function(){
+            document.getElementById(imgId).src = reader.result;
+        }
+        reader.readAsDataURL(e.target.files[0]);
+    });
+}
+
+preview("logoInput", "logo");
+preview("photoInput", "photo");
+preview("signInput", "signature");
+
+/* HD PDF */
+async function downloadPDF() {
+    const { jsPDF } = window.jspdf;
+
+    const canvas = await html2canvas(document.getElementById("card"), {
+        scale: 4,
+        useCORS: true
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+    });
+
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const imgWidth = pageWidth - 20;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+    pdf.save("Professional_ID_Card.pdf");
+}
+
+</script>
+
+</body>
+</html>
